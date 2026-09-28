@@ -1,122 +1,69 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useEffect, useState } from 'react'
+import { AnimatePresence, MotionConfig, motion as Motion } from 'framer-motion'
+import { Header } from './components/Header'
+import { Footer } from './components/Footer'
+import { Catalog } from './components/Catalog'
+import { ShoppingDialog } from './components/ShoppingDialog'
+import { TrustStrip, Hero, BrandStrip, PromoBanner, ShopByAge, ShopByCategory, SchoolBanner, WhyChooseUs, Testimonials, VisitStore } from './components/HomeSections'
+import { products } from './data/products'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+function readSaved(key, fallback) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key))
+    if (key === 'masterkids-wishlist') return Array.isArray(value) ? [...new Set(value.filter(id => products.some(p => p.id === id)))] : fallback
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return fallback
+    return Object.fromEntries(Object.entries(value).filter(([id, count]) => products.some(p => p.id === Number(id)) && Number.isInteger(count) && count > 0 && count <= 99))
+  } catch { return fallback }
 }
 
-export default App
+export default function App() {
+  const [cart, setCart] = useState(() => readSaved('masterkids-cart', {}))
+  const [wishlist, setWishlist] = useState(() => readSaved('masterkids-wishlist', []))
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('All New Items')
+  const [dialog, setDialog] = useState(null)
+  const [toast, setToast] = useState('')
+  useEffect(() => {
+    try {
+      localStorage.setItem('masterkids-cart', JSON.stringify(cart))
+      localStorage.setItem('masterkids-wishlist', JSON.stringify(wishlist))
+    } catch { /* Shopping still works when browser storage is unavailable. */ }
+  }, [cart, wishlist])
+  useEffect(() => {
+    if (!toast) return
+    const timer = setTimeout(() => setToast(''), 2800)
+    return () => clearTimeout(timer)
+  }, [toast])
+  const count = Object.values(cart).reduce((sum, quantity) => sum + quantity, 0)
+  const total = products.reduce((sum, product) => sum + product.price * (cart[product.id] || 0), 0)
+  function addToCart(product) {
+    setCart(current => ({ ...current, [product.id]: Math.min((current[product.id] || 0) + 1, 99) }))
+    setToast(`${product.name} added to your bag`)
+  }
+  function toggleWishlist(id) {
+    setWishlist(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id])
+  }
+  function search(value, selectedCategory) {
+    setQuery(value.trim())
+    setCategory(selectedCategory)
+    document.getElementById('new-arrivals')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+  }
+  const shopping = { wishlist, toggleWishlist, addToCart }
+  return (
+    <MotionConfig reducedMotion="user" transition={{ duration: 0.4, ease: 'easeOut' }}>
+      <a href="#main-content" className="skip-link">Skip to content</a>
+      <Header count={count} total={total} wishlistCount={wishlist.length} onSearch={search} onOpen={setDialog} />
+      <main id="main-content" className="min-h-screen bg-canvas-cream">
+        <TrustStrip /><Hero /><BrandStrip /><PromoBanner /><ShopByAge /><ShopByCategory />
+        <Catalog {...shopping} query={query} category={category} setCategory={setCategory} clearSearch={() => { setQuery(''); setCategory('All New Items') }} />
+        <SchoolBanner /><Catalog {...shopping} deals /><WhyChooseUs /><Testimonials /><VisitStore />
+      </main>
+      <Footer />
+      <ShoppingDialog mode={dialog} onClose={() => setDialog(null)} cart={cart} setCart={setCart} total={total} {...shopping} />
+      <div className="fixed bottom-5 inset-x-4 z-[70] flex justify-center pointer-events-none" role="status" aria-live="polite" aria-atomic="true">
+        <AnimatePresence>{toast && <Motion.div key={toast} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="max-w-md rounded-2xl bg-brand-purple-deep px-6 py-4 text-center text-sm text-white shadow-xl">✓ {toast}</Motion.div>}</AnimatePresence>
+      </div>
+    </MotionConfig>
+  )
+}

@@ -1,16 +1,30 @@
-# React + Vite
+# The Master Kids homepage
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite conversion of the supplied HTML, using Tailwind CSS and Framer Motion.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```sh
+npm install
+npm run dev
+```
 
-## React Compiler
+Validate with `npm run build` and `npm run lint`. Use `npm run preview` to preview the production build.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Editing
 
-## Expanding the ESLint configuration
+- `src/App.jsx`: page composition and cart/wishlist state.
+- `src/components/HomeSections.jsx`: original hero, categories, promotions, reviews and store sections.
+- `src/components/Header.jsx` and `Footer.jsx`: responsive navigation and footer.
+- `src/components/ProductCard.jsx` and `Catalog.jsx`: reusable product cards, search and filters.
+- `src/data/products.js`: the 12 supplied products, original image URLs and naira prices.
+- `tailwind.config.js`: original colour, spacing and typography tokens.
+- `src/App.css`: icon font, dialog and mobile refinements.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Integration notes
+
+Cart and wishlist use local storage. Cart supports quantities, removal and WhatsApp order enquiries. Account help uses the store contact; Toy Club opens an email membership request. No authentication, payment processing or subscription backend is connected.
+
+Images and Google Fonts are hosted externally. Store claims, reviews and prices are retained from the supplied HTML. Dedicated collection pages are outside this single-page conversion.
+
+Animations respect reduced-motion preferences. Build, lint and React render checks passed; browser visual verification was unavailable in the development session.
