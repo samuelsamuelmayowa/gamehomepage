@@ -23,6 +23,8 @@ Validate with `npm run build` and `npm run lint`. Use `npm run preview` to previ
 
 ## Integration notes
 
+Account pages are available at `/#/login`, `/#/signup` and `/#/forgot-password`. The header account link opens login on desktop and mobile. `src/components/AuthPage.jsx` contains the shared forms and illustration. Forms include validation, password visibility and signup password confirmation. Authentication and reset-email delivery need a backend; submitting displays an honest unavailable-service message and does not save credentials.
+
 Cart and wishlist use local storage. Cart supports quantities, removal and WhatsApp order enquiries. Account help uses the store contact; Toy Club opens an email membership request. No authentication, payment processing or subscription backend is connected.
 
 Images and Google Fonts are hosted externally. Store claims, reviews and prices are retained from the supplied HTML. Dedicated collection pages are outside this single-page conversion.

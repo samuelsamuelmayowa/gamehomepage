@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, MotionConfig, motion as Motion } from 'framer-motion'
 import { Header } from './components/Header'
+import { AuthPage } from './components/AuthPage'
 import { Footer } from './components/Footer'
 import { Catalog } from './components/Catalog'
 import { ShoppingDialog } from './components/ShoppingDialog'
@@ -18,6 +19,12 @@ function readSaved(key, fallback) {
 }
 
 export default function App() {
+  const [route, setRoute] = useState(() => typeof window === 'undefined' ? '' : window.location.hash)
+  useEffect(() => {
+    const updateRoute = () => setRoute(window.location.hash)
+    window.addEventListener('hashchange', updateRoute)
+    return () => window.removeEventListener('hashchange', updateRoute)
+  }, [])
   const [cart, setCart] = useState(() => readSaved('masterkids-cart', {}))
   const [wishlist, setWishlist] = useState(() => readSaved('masterkids-wishlist', []))
   const [query, setQuery] = useState('')
@@ -50,6 +57,10 @@ export default function App() {
     document.getElementById('new-arrivals')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
   }
   const shopping = { wishlist, toggleWishlist, addToCart }
+  const authMode = route.replace('#/', '')
+  if (['login', 'signup', 'forgot-password'].includes(authMode)) {
+    return <MotionConfig reducedMotion="user" transition={{ duration: 0.4, ease: 'easeOut' }}><a href="#main-content" onClick={event => { event.preventDefault(); document.getElementById('main-content')?.focus() }} className="skip-link">Skip to content</a><AuthPage mode={authMode} /></MotionConfig>
+  }
   return (
     <MotionConfig reducedMotion="user" transition={{ duration: 0.4, ease: 'easeOut' }}>
       <a href="#main-content" className="skip-link">Skip to content</a>

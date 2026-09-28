@@ -2,12 +2,7 @@ import { useState } from 'react'
 import { motion as Motion } from 'framer-motion'
 import { Icon } from './Icon'
 import { filters, formatPrice } from '../data/format'
-
-const navigation = [
-  ['Shop by Age', 'shop-by-age'], ['LEGO & Sets', 'categories'], ['STEM & Coding', 'categories'],
-  ['Puzzles & Board Games', 'new-arrivals'], ['Dolls & Pretend Play', 'new-arrivals'],
-  ['Back to School', 'back-to-school'], ['Hot Deals & Sale 🔥', 'hot-deals'], ['Brands', 'brands'],
-]
+import { ShopNavigation } from './ShopNavigation'
 
 export function Header({ count, total, wishlistCount, onSearch, onOpen }) {
   const [search, setSearch] = useState('')
@@ -35,11 +30,11 @@ export function Header({ count, total, wishlistCount, onSearch, onOpen }) {
         </form>
         <div className="order-2 xl:order-3 flex items-center gap-3 sm:gap-4 shrink-0">
           <button onClick={() => onOpen('wishlist')} aria-label={`Wishlist, ${wishlistCount} items`} className="flex items-center gap-2 text-on-surface-variant hover:text-primary"><span className="relative"><Icon>favorite</Icon><span className="absolute -top-1 -right-2 bg-secondary-container text-white text-[10px] min-w-4 h-4 px-1 rounded-full flex items-center justify-center">{wishlistCount}</span></span><span className="hidden 2xl:inline text-body-md">Wishlist</span></button>
-          <button aria-label="My Account" onClick={() => onOpen('account')} className="hidden sm:flex items-center gap-1 text-on-surface-variant hover:text-primary"><Icon>account_circle</Icon><span className="hidden 2xl:block text-left"><span className="block text-label-sm text-outline">Welcome</span><span className="text-body-md">My Account</span></span></button>
+          <a aria-label="Log in to My Account" href="#/login" className="flex items-center gap-1 text-on-surface-variant hover:text-primary"><Icon>account_circle</Icon><span className="hidden 2xl:block text-left"><span className="block text-label-sm text-outline">Welcome</span><span className="text-body-md">My Account</span></span></a>
           <button aria-label={`Open cart, ${count} items`} onClick={() => onOpen('cart')} className="flex items-center gap-3 bg-brand-yellow-soft hover:bg-tertiary-fixed text-on-tertiary-fixed px-3 sm:px-4 py-2 rounded-full transition-colors"><span className="relative"><Icon className="text-tertiary">shopping_bag</Icon><span className="absolute -top-1 -right-2 bg-primary text-white text-[10px] min-w-4 h-4 px-1 rounded-full flex items-center justify-center">{count}</span></span><span className="hidden md:block text-left"><span className="block text-label-sm uppercase text-tertiary">Cart</span><span className="text-price-md leading-none">{formatPrice(total)}</span></span></button>
         </div>
       </div>
-      <div className="bg-surface-container-low"><nav aria-label="Shop navigation" className="max-w-7xl mx-auto px-gutter flex items-center gap-1 overflow-x-auto py-2">{navigation.map(([label, id]) => <a key={id + label} href={`#${id}`} className="text-on-surface-variant hover:bg-surface-container-high hover:text-primary px-3 py-1 rounded-full font-semibold text-body-md whitespace-nowrap transition-colors">{label}</a>)}</nav></div>
+      <ShopNavigation />
     </header>
   )
 }
